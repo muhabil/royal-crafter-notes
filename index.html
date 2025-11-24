@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albion Crafting List</title>
+    <style>
+        /* --- CSS (Tampilan) --- */
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2c2c2c;
+            --text-color: #f0f0f0;
+            --accent-color: #d4af37;
+            --sub-text: #aaa;
+            --btn-danger: #e74c3c;
+            --btn-success: #2ecc71;
+            --section-bg: #252525;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 50px;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Container per Kategori Profesi */
+        .profession-section {
+            background-color: var(--section-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 40px;
+            border: 1px solid #333;
+            max-width: 1000px; /* Membatasi lebar biar ga terlalu melebar */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.4rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+        }
+
+        /* Label Tier (Pemisah Tier) */
+        .tier-label {
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            color: var(--sub-text);
+            margin: 20px 0 15px 0;
+            position: relative;
+            font-style: italic;
+        }
+
+        .tier-label::before, .tier-label::after {
+            content: "";
+            display: inline-block;
+            width: 30px;
+            height: 1px;
+            background: #555;
+            vertical-align: middle;
+            margin: 0 10px;
+        }
+
+        /* Grid Layout yang Centered */
+        .crafting-grid {
+            display: flex; /* Ganti ke Flex biar gampang dicenter */
+            flex-wrap: wrap;
+            justify-content: center; /* KUNCI CENTERING: Rata tengah */
+            gap: 15px;
+        }
+
+        .item-card {
+            background-color: var(--card-bg);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 12px;
+            width: 130px; /* Lebar tetap */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .item-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        .item-image {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+        }
+
+        .item-name {
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #ddd;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .counter-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #151515;
+            padding: 4px 6px;
+            border-radius: 20px;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .btn-count {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            font-size: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .btn-count:hover { opacity: 0.8; }
+        .minus { background-color: var(--btn-danger); }
+        .plus { background-color: var(--btn-success); }
+
+        .count-display {
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* --- CSS CALCULATOR V3 (Compact & Visual) --- */
+.calculator-section {
+    background-color: #222;
+    border: 1px solid #d4af37;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 30px auto;
+    max-width: 800px;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+}
+
+.calc-title {
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* --- INPUT AREA (GRID 3 KOLOM) --- */
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* Memaksa 3 kolom sejajar */
+    gap: 8px;
+    margin-bottom: 25px;
+    border-bottom: 1px dashed #444;
+    padding-bottom: 20px;
+}
+
+.input-card {
+    background: #2c2c2c;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 5px;
+}
+
+/* Digit Picker yang lebih kecil agar muat 3 kolom */
+.digit-picker {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+}
+
+.digit-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.digit-btn {
+    background: #333;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 0;
+    width: 20px; /* Ukuran tombol diperkecil */
+    height: 18px;
+    border-radius: 3px;
+    font-size: 0.6rem;
+}
+
+.digit-btn:hover { background: var(--accent-color); color: #000; }
+
+.digit-display {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    margin: 2px 0;
+    width: 15px;
+    text-align: center;
+}
+
+/* --- RESULT AREA (ITEM CARDS) --- */
+.result-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.price-card {
+    background-color: var(--card-bg);
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 10px;
+    width: 280px; /* Lebih lebar dari item biasa */
+    display: flex;
+    flex-direction: row; /* Kiri Gambar, Kanan List Harga */
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.price-card:hover {
+    border-color: var(--accent-color);
+}
+
+/* Bagian Kiri Kartu (Gambar Utama) */
+.pc-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    flex-shrink: 0;
+}
+
+.pc-main-img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
+.pc-title {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    text-align: center;
+    margin-top: 5px;
+    line-height: 1.2;
+}
+
+/* Bagian Kanan Kartu (List Harga) */
+.pc-right {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-left: 1px solid #444;
+    padding-left: 10px;
+}
+
+.cost-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.cost-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ccc;
+}
+
+.mini-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.cost-val {
+    font-family: 'Consolas', monospace; /* Font angka biar rapi */
+    font-weight: bold;
+    color: #fff;
+}
+        
+    </style>
+</head>
+<body>
+
+    <h1>⚔️ Albion Goals</h1>
+
+    <div class="calculator-section">
+    <div class="calc-title">💰 Material Price Calculator</div>
+
+    <div class="input-grid">
+        <div class="input-card">
+            <img src="https://render.albiononline.com/v1/item/T5_LEATHER" class="input-icon">
+            <div class="digit-picker" id="picker-leather"></div>
+        </div>
+        <div class="input-card">
+            <img src="https://render.albiononline.com/v1/item/T5_CLOTH" class="input-icon">
+            <div class="digit-picker" id="picker-cloth"></div>
+        </div>
+        <div class="input-card">
+            <img src="https://render.albiononline.com/v1/item/T5_METALBAR" class="input-icon">
+            <div class="digit-picker" id="picker-bar"></div>
+        </div>
+    </div>
+
+    <div class="result-grid">
+
+        <div class="price-card">
+            <div class="pc-left">
+                <img src="https://render.albiononline.com/v1/item/T5_ARMOR_LEATHER_SET1" class="pc-main-img">
+                <div class="pc-title">Chest Armor</div>
+            </div>
+            <div class="pc-right">
+                <div class="cost-row">
+                    <div class="cost-meta"><img src="https://render.albiononline.com/v1/item/T5_LEATHER" class="mini-icon"> L.Arm</div>
+                    <span id="res-chest-leather" class="cost-val">0</span>
+                </div>
+                <div class="cost-row">
+                    <div class="cost-meta"><img src="https://render.albiononline.com/v1/item/T5_CLOTH" class="mini-icon"> C.Arm</div>
+                    <span id="res-chest-cloth" class="cost-val">0</span>
+                </div>
+                <div class="cost-row">
+                    <div class="cost-meta"><img src="https://render.albiononline.com/v1/item/T5_METALBAR" class="mini-icon"> P.Arm</div>
+                    <span id="res-chest-bar" class="cost-val">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="price-card">
+            <div class="pc-left">
+                <img src="https://render.albiononline.com/v1/item/T5_SHOES_LEATHER_SET1" class="pc-main-img">
+                <div class="pc-title">Head / Boots</div>
+            </div>
+            <div class="pc-right">
+                <div class="cost-row">
+                    <div class="cost-meta"><img src="https://render.albiononline.com/v1/item/T5_LEATHER" class="mini-icon"> L.Set</div>
+                    <span id="res-head-leather" class="cost-val">0</span>
+                </div>
+                <div class="cost-row">
+                    <div class="cost-meta"><img src="https://render.albiononline.com/v1/item/T5_CLOTH" class="mini-icon"> C.Set</div>
+                    <span id="res-head-cloth" class="cost-val">0</span>
+                </div>
+                <div class="cost-row">
+                    <div class="cost-meta"><img src="https://render.albiononline.com/v1/item/T5_METALBAR" class="mini-icon"> P.Set</div>
+                    <span id="res-head-bar" class="cost-val">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="price-card">
+            <div class="pc-left">
+                <img src="https://render.albiononline.com/v1/item/T5_BAG" class="pc-main-img">
+                <div class="pc-title">Bag</div>
+            </div>
+            <div class="pc-right">
+                <div class="cost-row" style="margin-top: 10px;">
+                    <div class="cost-meta" style="color: gold;">TOTAL</div>
+                    <span id="res-bag" class="cost-val" style="font-size: 1.1rem; color: gold;">0</span>
+                </div>
+                <div style="font-size: 0.7rem; color: #666; margin-top: 5px; text-align: right;">
+                    (4 Lthr + 4 Clth)
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    <div class="profession-section">
+        <div class="section-title">🎒 General Items</div>
+        <div class="tier-label">Consumables & Bags</div>
+        <div class="crafting-grid">
+            <div class="item-card">
+                <img src="https://render.albiononline.com/v1/item/T4_BAG" class="item-image">
+                <div class="item-name">T4 Bag</div>
+                <div class="counter-wrapper">
+                    <button class="btn-count minus" onclick="updateCount(this, -1)">-</button>
+                    <span class="count-display">0</span>
+                    <button class="btn-count plus" onclick="updateCount(this, 1)">+</button>
+                </div>
+            </div>
+            <div class="item-card">
+                <img src="https://render.albiononline.com/v1/item/T4_POTION_HEAL" class="item-image">
+                <div class="item-name">Healing Pot</div>
+                <div class="counter-wrapper">
+                    <button class="btn-count minus" onclick="updateCount(this, -1)">-</button>
+                    <span class="count-display">0</span>
+                    <button class="btn-count plus" onclick="updateCount(this, 1)">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profession-section">
+        <div class="section-title">🪓 Lumberjack (Wood)</div>
+        <div class="tier-label">Tier 5 Set</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_HEAD_GATHERER_WOOD" class="item-image"><div class="item-name">T5 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_ARMOR_GATHERER_WOOD" class="item-image"><div class="item-name">T5 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_SHOES_GATHERER_WOOD" class="item-image"><div class="item-name">T5 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_BACKPACK_GATHERER_WOOD" class="item-image"><div class="item-name">T5 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_2H_TOOL_AXE" class="item-image"><div class="item-name">T5 Axe</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+    </div>
+
+    <div class="profession-section">
+        <div class="section-title">⛏️ Miner (Ore)</div>
+        <div class="tier-label">Tier 5 Set</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_HEAD_GATHERER_ORE" class="item-image"><div class="item-name">T5 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_ARMOR_GATHERER_ORE" class="item-image"><div class="item-name">T5 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_SHOES_GATHERER_ORE" class="item-image"><div class="item-name">T5 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_BACKPACK_GATHERER_ORE" class="item-image"><div class="item-name">T5 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_2H_TOOL_PICK" class="item-image"><div class="item-name">T5 Pickaxe</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+    </div>
+
+    <div class="profession-section">
+        <div class="section-title">🗡️ Skinner (Hide)</div>
+        <div class="tier-label">Tier 5 Set</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_HEAD_GATHERER_HIDE" class="item-image"><div class="item-name">T5 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_ARMOR_GATHERER_HIDE" class="item-image"><div class="item-name">T5 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_SHOES_GATHERER_HIDE" class="item-image"><div class="item-name">T5 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_BACKPACK_GATHERER_HIDE" class="item-image"><div class="item-name">T5 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_2H_TOOL_KNIFE" class="item-image"><div class="item-name">T5 Knife</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+    </div>
+
+    <div class="profession-section">
+        <div class="section-title">🔨 Quarrier (Stone)</div>
+        <div class="tier-label">Tier 5 Set</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_HEAD_GATHERER_ROCK" class="item-image"><div class="item-name">T5 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_ARMOR_GATHERER_ROCK" class="item-image"><div class="item-name">T5 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_SHOES_GATHERER_ROCK" class="item-image"><div class="item-name">T5 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_BACKPACK_GATHERER_ROCK" class="item-image"><div class="item-name">T5 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_2H_TOOL_HAMMER" class="item-image"><div class="item-name">T5 Hammer</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+    </div>
+
+    <div class="profession-section">
+        <div class="section-title">🌾 Harvester (Fiber)</div>
+        <div class="tier-label">Tier 5 Set</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_HEAD_GATHERER_FIBER" class="item-image"><div class="item-name">T5 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_ARMOR_GATHERER_FIBER" class="item-image"><div class="item-name">T5 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_SHOES_GATHERER_FIBER" class="item-image"><div class="item-name">T5 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_BACKPACK_GATHERER_FIBER" class="item-image"><div class="item-name">T5 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_2H_TOOL_SICKLE" class="item-image"><div class="item-name">T5 Sickle</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+    </div>
+
+    <div class="profession-section">
+        <div class="section-title">🎣 Fisherman Set</div>
+        
+        <div class="tier-label">Tier 5</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_HEAD_GATHERER_FISH" class="item-image"><div class="item-name">T5 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_ARMOR_GATHERER_FISH" class="item-image"><div class="item-name">T5 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_SHOES_GATHERER_FISH" class="item-image"><div class="item-name">T5 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_BACKPACK_GATHERER_FISH" class="item-image"><div class="item-name">T5 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T5_2H_TOOL_FISHINGROD" class="item-image"><div class="item-name">T5 Rod</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+
+        <div class="tier-label">Tier 6</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T6_HEAD_GATHERER_FISH" class="item-image"><div class="item-name">T6 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T6_ARMOR_GATHERER_FISH" class="item-image"><div class="item-name">T6 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T6_SHOES_GATHERER_FISH" class="item-image"><div class="item-name">T6 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T6_BACKPACK_GATHERER_FISH" class="item-image"><div class="item-name">T6 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T6_2H_TOOL_FISHINGROD" class="item-image"><div class="item-name">T6 Rod</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+
+        <div class="tier-label">Tier 7</div>
+        <div class="crafting-grid">
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T7_HEAD_GATHERER_FISH" class="item-image"><div class="item-name">T7 Cap</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T7_ARMOR_GATHERER_FISH" class="item-image"><div class="item-name">T7 Garb</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T7_SHOES_GATHERER_FISH" class="item-image"><div class="item-name">T7 Boots</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T7_BACKPACK_GATHERER_FISH" class="item-image"><div class="item-name">T7 Bag</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+            <div class="item-card"><img src="https://render.albiononline.com/v1/item/T7_2H_TOOL_FISHINGROD" class="item-image"><div class="item-name">T7 Rod</div><div class="counter-wrapper"><button class="btn-count minus" onclick="updateCount(this, -1)">-</button><span class="count-display">0</span><button class="btn-count plus" onclick="updateCount(this, 1)">+</button></div></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Happy Crafting! 🌙</p>
+    </footer>
+
+    <script>
+        function updateCount(button, change) {
+            const wrapper = button.parentElement;
+            const display = wrapper.querySelector('.count-display');
+            let currentCount = parseInt(display.innerText);
+            let newCount = currentCount + change;
+            if (newCount < 0) newCount = 0;
+            display.innerText = newCount;
+        }
+
+        // --- DATA HARGA (Init 0000) ---
+        const prices = {
+            leather: [0, 0, 0, 0], 
+            cloth:   [0, 0, 0, 0],
+            bar:     [0, 0, 0, 0]
+        };
+
+        // --- INIT PICKER ---
+        function initPicker(type) {
+            const container = document.getElementById(`picker-${type}`);
+            let html = '';
+            for (let i = 0; i < 4; i++) {
+                html += `
+                <div class="digit-column">
+                    <button class="digit-btn" onclick="changeDigit('${type}', ${i}, 1)">▲</button>
+                    <div class="digit-display" id="disp-${type}-${i}">0</div>
+                    <button class="digit-btn" onclick="changeDigit('${type}', ${i}, -1)">▼</button>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        initPicker('leather');
+        initPicker('cloth');
+        initPicker('bar');
+
+        // --- CHANGE DIGIT ---
+        function changeDigit(type, index, direction) {
+            let newVal = prices[type][index] + direction;
+            if (newVal > 9) newVal = 0;
+            if (newVal < 0) newVal = 9;
+            prices[type][index] = newVal;
+            
+            document.getElementById(`disp-${type}-${index}`).innerText = newVal;
+            calculateCosts();
+        }
+
+        // --- CALCULATE ---
+        function calculateCosts() {
+            const getPrice = (arr) => (arr[0]*1000) + (arr[1]*100) + (arr[2]*10) + arr[3];
+
+            let pLeather = getPrice(prices.leather);
+            let pCloth   = getPrice(prices.cloth);
+            let pBar     = getPrice(prices.bar);
+
+            // Format Angka (biar ada titiknya: 12.000)
+            const fmt = (num) => num.toLocaleString('id-ID');
+
+            // 1. Chest (16 pcs)
+            document.getElementById('res-chest-leather').innerText = fmt(pLeather * 16);
+            document.getElementById('res-chest-cloth').innerText   = fmt(pCloth * 16);
+            document.getElementById('res-chest-bar').innerText     = fmt(pBar * 16);
+
+            // 2. Head/Boots (8 pcs)
+            document.getElementById('res-head-leather').innerText = fmt(pLeather * 8);
+            document.getElementById('res-head-cloth').innerText   = fmt(pCloth * 8);
+            document.getElementById('res-head-bar').innerText     = fmt(pBar * 8);
+
+            // 3. Bag (4 Leather + 4 Cloth)
+            document.getElementById('res-bag').innerText = fmt((pLeather * 4) + (pCloth * 4));
+        }
+
+        // --- COUNTER BIASA (JANGAN DIHAPUS) ---
+        function updateCount(button, change) {
+            const wrapper = button.parentElement;
+            const display = wrapper.querySelector('.count-display');
+            let currentCount = parseInt(display.innerText);
+            let newCount = currentCount + change;
+            if (newCount < 0) newCount = 0;
+            display.innerText = newCount;
+        }
+    </script>
+</body>
+</html>
