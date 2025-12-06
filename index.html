@@ -202,11 +202,43 @@
             margin-top: 10px; font-weight: bold; padding-top: 10px; border-top: 1px dashed #555;
         }
 
+        /* --- 0. TEMPLATE SELECTOR --- */
+        .template-selector {
+            text-align: center;
+            margin-bottom: 15px;
+            background: #111;
+            padding: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        select {
+            background-color: #222;
+            color: var(--accent-gold);
+            border: 1px solid #444;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        select:focus { outline: none; border-color: var(--accent-gold); }
+
     </style>
 </head>
 <body>
 
     <h1>⚜️ Royal Crafter Notes</h1>
+
+    <div class="template-selector">
+        <label for="city-select" style="color:#aaa; font-size:0.8rem; margin-right:10px;">PILIH TEMPLATE:</label>
+        <select id="city-select" onchange="loadTemplate(this.value)">
+            <option value="custom">-- Custom / Reset --</option>
+            <option value="lymhurst">🌲 Lymhurst (Wood Focus)</option>
+            <option value="fortsterling">🔨 Fort Sterling (Ore Focus)</option>
+            <option value="bridgewatch">🗡️ Bridgewatch (Hide/Stone)</option>
+            <option value="martlock">🛡️ Martlock (Hide/Ore)</option>
+            <option value="thetford">🌾 Thetford (Fiber/Wood)</option>
+        </select>
+    </div>
 
     <div class="price-section">
         <div class="price-grid">
@@ -518,6 +550,114 @@
                 card.querySelector('.min').click();
             }
         }
+
+        // --- DATA TEMPLATE / BOOKMARK ---
+        // Format: 'nama_kota': { 'KODE_ITEM': JUMLAH, 'KODE_ITEM_LAIN': JUMLAH }
+        // KODE_ITEM diambil dari data-img di HTML (tanpa link, cuma namanya aja)
+        
+        const craftTemplates = {
+            'lymhurst': {
+                'T5_HEAD_GATHERER_HIDE': 3,   // 10 Cap Lumber
+                'T5_SHOES_GATHERER_HIDE': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_HIDE': 3,
+                'T5_HEAD_GATHERER_ROCK': 3,   // 10 Cap Lumber
+                'T5_ARMOR_GATHERER_ROCK': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_ROCK': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_FISH': 3
+            },
+            'fortsterling': {
+                // Contoh: Di FS mau craft Miner & Quarrier
+                'T5_HEAD_GATHERER_ORE': 3,   // 10 Cap Lumber
+                 // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_ORE': 3,
+                'T5_HEAD_GATHERER_ROCK': 3,   // 10 Cap Lumber
+                'T5_ARMOR_GATHERER_ROCK': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_ROCK': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_ROCK': 3,
+                'T5_HEAD_GATHERER_FIBER': 3,   // 10 Cap Lumber
+                'T5_ARMOR_GATHERER_FIBER': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_FIBER': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_FIBER': 3,
+                'T5_ARMOR_GATHERER_FISH': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_FISH': 3,
+                'T5_BACKPACK_GATHERER_FISH': 3,
+            },
+            'bridgewatch': {
+                // Kosongin dulu contohnya
+                'T5_ARMOR_GATHERER_ORE': 3,  // 20 Garb Lumber
+                'T5_HEAD_GATHERER_HIDE': 3,   // 10 Cap Lumber
+                'T5_SHOES_GATHERER_HIDE': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_HIDE': 3,
+                'T5_HEAD_GATHERER_FIBER': 3,   // 10 Cap Lumber
+                'T5_SHOES_GATHERER_FISH': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_FISH': 3,
+            },
+            'martlock': {
+                // Kosongin dulu
+                'T5_HEAD_GATHERER_WOOD': 3,   // 10 Cap Lumber
+                'T5_BACKPACK_GATHERER_WOOD': 3,  // 20 Garb Lumber
+                'T5_HEAD_GATHERER_ORE': 3,   // 10 Cap
+                'T5_SHOES_GATHERER_ORE': 3,  // 10 Boots Lumber
+                'T5_ARMOR_GATHERER_ROCK': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_ROCK': 3,  // 10 Boots Lumber
+                'T5_HEAD_GATHERER_FISH': 3,   // 10 Cap Lumber
+                'T5_SHOES_GATHERER_FISH': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_FISH': 3,
+            },
+            'thetford': {
+                // Kosongin dulu
+                'T5_HEAD_GATHERER_WOOD': 3,   // 10 Cap Lumber
+                'T5_ARMOR_GATHERER_WOOD': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_WOOD': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_WOOD': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_HIDE': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_HIDE': 3,
+                'T5_HEAD_GATHERER_FISH': 3,   // 10 Cap Lumber
+                'T5_ARMOR_GATHERER_FISH': 3,  // 20 Garb Lumber
+                'T5_SHOES_GATHERER_FISH': 3,  // 10 Boots Lumber
+                'T5_BACKPACK_GATHERER_FISH': 3,
+            }
+        };
+
+        // --- FUNGSI LOAD TEMPLATE ---
+        function loadTemplate(cityKey) {
+            // 1. Reset Dulu Semua ke 0
+            document.querySelectorAll('.cnt-val').forEach(el => el.innerText = '0');
+            document.querySelectorAll('.item-card').forEach(el => el.classList.remove('active'));
+
+            // Kalau pilih custom/reset, berhenti di sini (sudah direset)
+            if (cityKey === 'custom' || !craftTemplates[cityKey]) {
+                calc();
+                return;
+            }
+
+            // 2. Ambil Data Template
+            const data = craftTemplates[cityKey];
+
+            // 3. Isi Item Counter
+            for (const [itemId, qty] of Object.entries(data)) {
+                // Skip kalau key-nya '_PRICES' (buat fitur lanjutan)
+                if (itemId === '_PRICES') continue;
+
+                // Cari kartu berdasarkan data-img
+                const card = document.querySelector(`.item-card[data-img="${itemId}"]`);
+                if (card) {
+                    const disp = card.querySelector('.cnt-val');
+                    disp.innerText = qty;
+                    card.classList.add('active');
+                }
+            }
+
+            // 4. (Opsional) Isi Harga jika ada di template
+            if (data._PRICES) {
+                // Logic untuk update harga (perlu penyesuaian fungsi digit picker, 
+                // tapi saran saya harga mending manual karena pasar fluktuatif)
+            }
+
+            // 5. Hitung Ulang Semua
+            calc();
+        }
     </script>
 </body>
 </html>
+
